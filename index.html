@@ -1,0 +1,544 @@
+
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Mie Attività | Portfolio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome per Icone Raffinate -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cormorant Garamond per corsivi eleganti & Inter per dettagli micro -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400;1,600;1,700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* Definizione font ed stili generali */
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            overflow-x: hidden;
+        }
+
+        /* Micro font sans-serif per piccoli dettagli tecnici */
+        .sans-tech {
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
+        }
+
+        /* Sfondo con bagliore radiale interattivo */
+        #interactive-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.05), transparent 80%);
+            transition: background 0.15s ease-out;
+        }
+
+        /* Canvas per particelle sottili */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        /* Card Glassmorphism e Bordi Luminosi */
+        .glass-card {
+            background: rgba(18, 18, 20, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+            transition: all 0.4s cubic-bezier(0.16. 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.05),
+                transparent
+            );
+            transition: 0.6s;
+        }
+
+        .glass-card:hover::before {
+            left: 100%;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 20px 40px -15px rgba(255, 255, 255, 0.07);
+        }
+
+        /* Animazioni di comparsa scroll */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        /* Glow e sfumature del testo */
+        .glow-text {
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .badge-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-gray-100 selection:bg-white selection:text-black">
+
+    <!-- Sfondo con bagliore reattivo e canvas particelle -->
+    <div id="interactive-bg"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="relative z-10 flex flex-col min-h-screen">
+
+        <!-- Navigation / Header -->
+        <header class="sticky top-0 z-50 backdrop-blur-md bg-black/40 border-b border-white/5 py-4 px-6 md:px-12">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <a href="#" class="text-2xl font-bold italic tracking-wider text-white hover:opacity-80 transition-opacity flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                    <em>Spazio Personale</em>
+                </a>
+                
+                <nav class="hidden md:flex gap-8 text-lg italic text-gray-300">
+                    <a href="#attivita" class="hover:text-white transition-colors relative group">
+                        Attività
+                        <span class="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#progetti" class="hover:text-white transition-colors relative group">
+                        Progetti
+                        <span class="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="#stats" class="hover:text-white transition-colors relative group">
+                        In Breve
+                        <span class="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                </nav>
+
+                <div class="sans-tech text-xs border border-white/20 px-3 py-1.5 rounded-full text-gray-400">
+                    <i class="fa-solid fa-moon mr-1"></i> Dark Mode
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="py-24 px-6 md:px-12 max-w-5xl mx-auto text-center reveal">
+            <span class="sans-tech text-xs tracking-[0.3em] uppercase text-gray-400 mb-4 inline-block border-b border-white/10 pb-1">
+                Curriculum Vitae & Passioni
+            </span>
+            <h1 class="text-5xl md:text-7xl font-light italic tracking-tight text-white glow-text mb-6 leading-tight">
+                Esplorazioni, Studi & Ambizioni
+            </h1>
+            <p class="text-xl md:text-2xl font-light text-gray-300 max-w-3xl mx-auto italic mb-10 leading-relaxed">
+                "Un riassunto dinamico delle mie attività quotidiane, progetti tecnologici, letture ed esperienze sportive."
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="#attivita" class="glass-card px-8 py-3 rounded-full text-lg italic text-white hover:bg-white hover:text-black transition-all duration-300 flex items-center gap-2">
+                    Esplora Indici <i class="fa-solid fa-arrow-down text-xs"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- Main Content Section: Le 7 Attività -->
+        <main id="attivita" class="max-w-7xl mx-auto px-6 md:px-12 py-12 w-full flex-grow">
+            
+            <div class="flex justify-between items-end mb-12 border-b border-white/10 pb-4 reveal">
+                <div>
+                    <h2 class="text-3xl md:text-4xl italic font-semibold text-white">Le Mie Attività</h2>
+                    <p class="text-gray-400 italic text-base mt-1">Sette ambiti che definiscono il mio percorso</p>
+                </div>
+                <span class="sans-tech text-sm text-gray-500">01 — 07</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <!-- 1. FANTACALCIO -->
+                <div class="glass-card p-8 rounded-2xl reveal flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="sans-tech text-xs text-gray-400 border border-white/10 px-2.5 py-1 rounded-md">01. LUDICO</span>
+                            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10">
+                                <i class="fa-solid fa-[#000] fa-futbol text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-semibold italic text-white mb-3">Fantacalcio</h3>
+                        <p class="text-gray-300 text-lg leading-relaxed italic mb-6">
+                            Gestione strategica della rosa, analisi avanzata delle statistiche dei calciatori e studio delle metriche xG per dominare la lega d'asta.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Asta Strategica</span>
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Statistiche</span>
+                        </div>
+                        <div class="pt-4 border-t border-white/5 flex justify-between items-center text-sm text-gray-400">
+                            <span>Stagione Attiva</span>
+                            <i class="fa-solid fa-trophy text-amber-400/80"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. STUDI -->
+                <div class="glass-card p-8 rounded-2xl reveal flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="sans-tech text-xs text-gray-400 border border-white/10 px-2.5 py-1 rounded-md">02. FORMAZIONE</span>
+                            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10">
+                                <i class="fa-solid fa-graduation-cap text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-semibold italic text-white mb-3">Studi</h3>
+                        <p class="text-gray-300 text-lg leading-relaxed italic mb-6">
+                            Percorso accademico continuo incentrato sull'informatica, l'ingegneria del software, i sistemi distribuiti e la sicurezza informatica.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Informatica</span>
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Algoritmi</span>
+                        </div>
+                        <div class="pt-4 border-t border-white/5 flex justify-between items-center text-sm text-gray-400">
+                            <span>In corso</span>
+                            <i class="fa-solid fa-book-open text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. PROGETTI COMPLETATI -->
+                <div id="progetti" class="glass-card p-8 rounded-2xl reveal flex flex-col justify-between md:col-span-2 lg:col-span-1">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="sans-tech text-xs text-gray-400 border border-white/10 px-2.5 py-1 rounded-md">03. PORTFOLIO</span>
+                            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10">
+                                <i class="fa-solid fa-square-check text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-semibold italic text-white mb-3">Progetti completati</h3>
+                        <p class="text-gray-300 text-lg leading-relaxed italic mb-6">
+                            Sviluppo di applicazioni web full-stack, script di automazione e sistemi software rilasciati con successo negli ultimi anni.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Web App</span>
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Open Source</span>
+                        </div>
+                        <div class="pt-4 border-t border-white/5 flex justify-between items-center text-sm text-gray-400">
+                            <span>Totale Rilasci</span>
+                            <span class="sans-tech text-white font-bold" id="counter-projects">18+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. TECH -->
+                <div class="glass-card p-8 rounded-2xl reveal flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="sans-tech text-xs text-gray-400 border border-white/10 px-2.5 py-1 rounded-md">04. INNOVAZIONE</span>
+                            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10">
+                                <i class="fa-solid fa-microchip text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-semibold italic text-white mb-3">Tech</h3>
+                        <p class="text-gray-300 text-lg leading-relaxed italic mb-6">
+                            Esplorazione costante di nuovi framework, intelligenza artificiale generativa, architetture cloud e gadget d'avanguardia.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">AI / LLM</span>
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">DevOps</span>
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Hardware</span>
+                        </div>
+                        <div class="pt-4 border-t border-white/5 flex justify-between items-center text-sm text-gray-400">
+                            <span>Stack Preferito</span>
+                            <i class="fa-solid fa-code text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. PODCAST -->
+                <div class="glass-card p-8 rounded-2xl reveal flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="sans-tech text-xs text-gray-400 border border-white/10 px-2.5 py-1 rounded-md">05. AUDIO</span>
+                            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10">
+                                <i class="fa-solid fa-podcast text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-semibold italic text-white mb-3">Podcast</h3>
+                        <p class="text-gray-300 text-lg leading-relaxed italic mb-6">
+                            Ascolto quotidiano focalizzato su tecnologia, filosofia contemporanea, startup, storie di grandi imprenditori e divulgazione scientifica.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Tech News</span>
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Storytelling</span>
+                        </div>
+                        <div class="pt-4 border-t border-white/5 flex justify-between items-center text-sm text-gray-400">
+                            <span>Playlist Giornaliera</span>
+                            <i class="fa-solid fa-headphones text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. LIBRI -->
+                <div class="glass-card p-8 rounded-2xl reveal flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-6">
+                            <span class="sans-tech text-xs text-gray-400 border border-white/10 px-2.5 py-1 rounded-md">06. LETTURA</span>
+                            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10">
+                                <i class="fa-solid fa-book text-lg"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-semibold italic text-white mb-3">Libri</h3>
+                        <p class="text-gray-300 text-lg leading-relaxed italic mb-6">
+                            Collezione di saggi tecnici, biografie d'impatto, classici della letteratura mondiale e narrativa fantascientifica.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Saggistica</span>
+                            <span class="badge-tag sans-tech text-xs px-2.5 py-1 rounded-full text-gray-300">Sci-Fi</span>
+                        </div>
+                        <div class="pt-4 border-t border-white/5 flex justify-between items-center text-sm text-gray-400">
+                            <span>Obiettivo Annuo: 24 Libri</span>
+                            <i class="fa-solid fa-bookmark text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. SPORT -->
+                <div class="glass-card p-8 rounded-2xl reveal flex flex-col justify-between md:col-span-2 lg:col-span-3">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                        <div class="lg:col-span-2">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="sans-tech text-xs text-gray-400 border border-white/10 px-2.5 py-1 rounded-md">07. SALUTE & WELLNESS</span>
+                                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white border border-white/10">
+                                    <i class="fa-solid fa-person-running text-lg"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-3xl font-semibold italic text-white mb-3">Sport & Attività Fisica</h3>
+                            <p class="text-gray-300 text-xl leading-relaxed italic mb-4">
+                                Allenamento costante per mantenere l'equilibrio mente-corpo. Pratica regolare di corsa, palestra e sport di squadra per preservare focus, disciplina e reattività.
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="badge-tag sans-tech text-xs px-3 py-1 rounded-full text-gray-300">Running</span>
+                                <span class="badge-tag sans-tech text-xs px-3 py-1 rounded-full text-gray-300">Palestra</span>
+                                <span class="badge-tag sans-tech text-xs px-3 py-1 rounded-full text-gray-300">Calcio</span>
+                            </div>
+                        </div>
+                        <div class="border-t lg:border-t-0 lg:border-l border-white/10 pt-6 lg:pt-0 lg:pl-8 flex flex-col gap-4">
+                            <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                                <div class="sans-tech text-xs text-gray-400">SESSIONI SETTIMANALI</div>
+                                <div class="text-2xl font-bold italic text-white">4 - 5 Allenamenti</div>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                                <div class="sans-tech text-xs text-gray-400">DISCIPLINA</div>
+                                <div class="text-2xl font-bold italic text-white">Costanza & Focus</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- Interactive Section: Citazione o Statistiche -->
+        <section id="stats" class="max-w-5xl mx-auto px-6 py-16 w-full text-center reveal">
+            <div class="glass-card p-12 rounded-3xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 text-white/5 text-9xl font-serif pointer-events-none">”</div>
+                <h3 class="text-3xl md:text-4xl italic text-white mb-6">
+                    "La semplicità è l'ultima sofisticazione."
+                </h3>
+                <p class="sans-tech text-sm tracking-widest text-gray-400 uppercase">
+                    — Leonardo da Vinci
+                </p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-auto border-t border-white/10 py-8 px-6 text-center text-gray-400 italic">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-lg">© <span id="year"></span> — Tutti i diritti riservati</p>
+                <div class="flex gap-6 text-xl">
+                    <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fa-solid fa-envelope"></i></a>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Set dynamic current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        /* 1. SEGUIMENTO MOUSE PER BAGLIORE RADIALE */
+        const bg = document.getElementById('interactive-bg');
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            bg.style.setProperty('--mouse-x', `${x}%`);
+            bg.style.setProperty('--mouse-y', `${y}%`);
+        });
+
+        /* 2. PARTICELLE SFONDO SOTTILI (CANVAS) */
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.floor((canvas.width * canvas.height) / 15000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((particle) => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        /* 3. INTERSECTION OBSERVER PER ANIMAZIONI DI SCROLL (FADE-IN) */
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Piccolo ritardo stagger per un effetto cascata
+                    setTimeout(() => {
+                        entry.target.classList.add('active');
+                    }, 100);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach((el) => {
+            observer.observe(el);
+        });
+
+        /* 4. TILT EFFECT LEGGERO SULLE CARD AL MOUSEOVER */
+        const cards = document.querySelectorAll('.glass-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 25;
+                const rotateY = (centerX - x) / 25;
+
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
+            });
+        });
+    </script>
+</body>
+</html>
